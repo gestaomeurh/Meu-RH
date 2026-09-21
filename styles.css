@@ -61,3 +61,5 @@
 .clients.is-ready .logo-window,.logo-window{scrollbar-width:none;-ms-overflow-style:none;}
 .logo-window::-webkit-scrollbar{display:none;width:0;height:0;}
 .carousel-hint{margin:18px 7% 0;font-size:.875rem;color:#656565;}
+
+@media(max-width:760px){.decorative-symbol,.image-caption .gold{display:none!important}.values li:before{content:none;display:none}.menu-toggle>span{display:none}}
