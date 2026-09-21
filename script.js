@@ -30,30 +30,17 @@ motionPreference.addEventListener('change',setupReveals);
 const clients=document.querySelector('.clients');
 const logoTrack=document.querySelector('.logo-track');
 const logoGroup=document.querySelector('.logo-group');
-const carouselToggle=document.querySelector('.carousel-toggle');
-if(clients&&logoTrack&&logoGroup&&carouselToggle){
+if(clients&&logoTrack&&logoGroup){
   const scroller=document.querySelector('.logo-window');
-  const previous=document.querySelector('.carousel-prev');
-  const next=document.querySelector('.carousel-next');
-  let paused=false,hovered=false,visible=true,direction=1,lastTime=0,position=scroller.scrollLeft;
-  let dragging=false,startX=0,startScroll=0;
+  let hovered=false,visible=true,direction=1,lastTime=0,position=scroller.scrollLeft;
+  let dragging=false,touching=false,startX=0,startScroll=0;
   clients.classList.add('is-ready');
-  function setPaused(value){
-    paused=value;
-    clients.classList.toggle('is-paused',paused);
-    carouselToggle.setAttribute('aria-pressed',String(paused));
-    carouselToggle.querySelector('.pause-label').textContent=paused?'Retomar movimento':'Pausar movimento';
-    carouselToggle.querySelector('.pause-symbol').textContent=paused?'▷':'Ⅱ';
-    position=scroller.scrollLeft;
-  }
-  carouselToggle.addEventListener('click',()=>setPaused(!paused));
   scroller.addEventListener('mouseenter',()=>{hovered=true;});
-  scroller.addEventListener('mouseleave',()=>{hovered=false;});
-  scroller.addEventListener('wheel',()=>setPaused(true),{passive:true});
-  scroller.addEventListener('pointerdown',()=>setPaused(true),{passive:true});
-  scroller.addEventListener('keydown',event=>{
-    if(['ArrowLeft','ArrowRight','Home','End','PageUp','PageDown'].includes(event.key))setPaused(true);
-  });
+  scroller.addEventListener('mouseleave',()=>{hovered=false;position=scroller.scrollLeft;});
+  scroller.addEventListener('touchstart',()=>{touching=true;},{passive:true});
+  function endTouch(){touching=false;position=scroller.scrollLeft;}
+  scroller.addEventListener('touchend',endTouch,{passive:true});
+  scroller.addEventListener('touchcancel',endTouch,{passive:true});
   logoTrack.addEventListener('dragstart',event=>event.preventDefault());
   logoTrack.addEventListener('pointerdown',event=>{
     if(event.pointerType!=='mouse'||event.button!==0)return;
@@ -69,23 +56,10 @@ if(clients&&logoTrack&&logoGroup&&carouselToggle){
   logoTrack.addEventListener('pointerup',endDrag);
   logoTrack.addEventListener('pointercancel',endDrag);
   logoTrack.addEventListener('lostpointercapture',endDrag);
-  function advance(sign){
-    setPaused(true);
-    scroller.scrollBy({left:sign*(logoGroup.firstElementChild.getBoundingClientRect().width+18),behavior:motionPreference.matches?'instant':'smooth'});
-  }
-  previous?.addEventListener('click',()=>advance(-1));
-  next?.addEventListener('click',()=>advance(1));
-  function updateControls(){
-    const max=scroller.scrollWidth-scroller.clientWidth;
-    if(previous)previous.disabled=scroller.scrollLeft<=1;
-    if(next)next.disabled=scroller.scrollLeft>=max-1;
-  }
-  scroller.addEventListener('scroll',updateControls,{passive:true});
-  window.addEventListener('resize',()=>{position=scroller.scrollLeft;updateControls();});
-  updateControls();
+  window.addEventListener('resize',()=>{position=scroller.scrollLeft;});
   function animate(time){
     const elapsed=lastTime?Math.min(time-lastTime,50):0;lastTime=time;
-    if(!paused&&!hovered&&visible&&!document.hidden&&!motionPreference.matches&&!scroller.matches(':focus-within')){
+    if(!hovered&&!dragging&&!touching&&visible&&!document.hidden&&!motionPreference.matches){
       const max=scroller.scrollWidth-scroller.clientWidth;
       if(max>0){
         position=Math.max(0,Math.min(max,position+direction*elapsed*.032));
