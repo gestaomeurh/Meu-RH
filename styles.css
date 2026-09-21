@@ -46,3 +46,13 @@
 .logo-window::-webkit-scrollbar-thumb{background:#b3a27c;border-color:#eeece7;}
 @media(max-width:760px){.client-logo,.client-logo.logo-farma{width:190px;height:130px;padding:20px;}.client-logo .logo-art{width:140px;height:84px;}}
 .client-logo.logo-farma .logo-art{height:68px;background:#cf202b;border-radius:3px}.client-logo.logo-farma img{height:88px;width:148px;max-width:none;padding:0;background:transparent;transform:scale(1.12)}
+
+/* Service cards: white at rest, black only while hovered. */
+.service:not(.service-cta){background:#fff;color:#111;transition:background .25s,color .25s;}
+.service:not(.service-cta) p{color:#656565;}
+.service:not(.service-cta) .number,.service:not(.service-cta) a:not(.button){color:#8c6500;}
+@media(hover:hover){
+.service-grid .service:not(.service-cta):hover{background:#111;color:#fff;box-shadow:none;}
+.service:not(.service-cta):hover p{color:#d2d2d2;}
+.service:not(.service-cta):hover .number,.service:not(.service-cta):hover a:not(.button){color:var(--gold);}
+}
