@@ -32,19 +32,74 @@ const logoTrack=document.querySelector('.logo-track');
 const logoGroup=document.querySelector('.logo-group');
 const carouselToggle=document.querySelector('.carousel-toggle');
 if(clients&&logoTrack&&logoGroup&&carouselToggle){
-  const duplicate=logoGroup.cloneNode(true);
-  duplicate.removeAttribute('aria-label');
-  duplicate.setAttribute('aria-hidden','true');
-  duplicate.querySelectorAll('img').forEach(img=>img.alt='');
-  logoTrack.appendChild(duplicate);
+  const scroller=document.querySelector('.logo-window');
+  const previous=document.querySelector('.carousel-prev');
+  const next=document.querySelector('.carousel-next');
+  let paused=false,hovered=false,visible=true,direction=1,lastTime=0,position=scroller.scrollLeft;
+  let dragging=false,startX=0,startScroll=0;
   clients.classList.add('is-ready');
-  carouselToggle.addEventListener('click',()=>{
-    const paused=clients.classList.toggle('is-paused');
+  function setPaused(value){
+    paused=value;
+    clients.classList.toggle('is-paused',paused);
     carouselToggle.setAttribute('aria-pressed',String(paused));
     carouselToggle.querySelector('.pause-label').textContent=paused?'Retomar movimento':'Pausar movimento';
     carouselToggle.querySelector('.pause-symbol').textContent=paused?'▷':'Ⅱ';
+    position=scroller.scrollLeft;
+  }
+  carouselToggle.addEventListener('click',()=>setPaused(!paused));
+  scroller.addEventListener('mouseenter',()=>{hovered=true;});
+  scroller.addEventListener('mouseleave',()=>{hovered=false;});
+  scroller.addEventListener('wheel',()=>setPaused(true),{passive:true});
+  scroller.addEventListener('pointerdown',()=>setPaused(true),{passive:true});
+  scroller.addEventListener('keydown',event=>{
+    if(['ArrowLeft','ArrowRight','Home','End','PageUp','PageDown'].includes(event.key))setPaused(true);
   });
+  logoTrack.addEventListener('dragstart',event=>event.preventDefault());
+  logoTrack.addEventListener('pointerdown',event=>{
+    if(event.pointerType!=='mouse'||event.button!==0)return;
+    dragging=true;startX=event.clientX;startScroll=scroller.scrollLeft;
+    logoTrack.setPointerCapture(event.pointerId);
+    scroller.classList.add('is-dragging');
+    event.preventDefault();
+  });
+  logoTrack.addEventListener('pointermove',event=>{
+    if(dragging){scroller.scrollLeft=startScroll-(event.clientX-startX);position=scroller.scrollLeft;}
+  });
+  function endDrag(){dragging=false;scroller.classList.remove('is-dragging');}
+  logoTrack.addEventListener('pointerup',endDrag);
+  logoTrack.addEventListener('pointercancel',endDrag);
+  logoTrack.addEventListener('lostpointercapture',endDrag);
+  function advance(sign){
+    setPaused(true);
+    scroller.scrollBy({left:sign*(logoGroup.firstElementChild.getBoundingClientRect().width+18),behavior:motionPreference.matches?'instant':'smooth'});
+  }
+  previous?.addEventListener('click',()=>advance(-1));
+  next?.addEventListener('click',()=>advance(1));
+  function updateControls(){
+    const max=scroller.scrollWidth-scroller.clientWidth;
+    if(previous)previous.disabled=scroller.scrollLeft<=1;
+    if(next)next.disabled=scroller.scrollLeft>=max-1;
+  }
+  scroller.addEventListener('scroll',updateControls,{passive:true});
+  window.addEventListener('resize',()=>{position=scroller.scrollLeft;updateControls();});
+  updateControls();
+  function animate(time){
+    const elapsed=lastTime?Math.min(time-lastTime,50):0;lastTime=time;
+    if(!paused&&!hovered&&visible&&!document.hidden&&!motionPreference.matches&&!scroller.matches(':focus-within')){
+      const max=scroller.scrollWidth-scroller.clientWidth;
+      if(max>0){
+        position=Math.max(0,Math.min(max,position+direction*elapsed*.032));
+        scroller.scrollLeft=position;
+        if(position>=max)direction=-1;
+        else if(position<=0)direction=1;
+      }
+    }else{position=scroller.scrollLeft;}
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+  motionPreference.addEventListener('change',()=>{position=scroller.scrollLeft;});
+  document.addEventListener('visibilitychange',()=>{lastTime=0;});
   if('IntersectionObserver' in window){
-    new IntersectionObserver(entries=>entries.forEach(entry=>clients.classList.toggle('is-offscreen',!entry.isIntersecting))).observe(clients);
+    new IntersectionObserver(entries=>entries.forEach(entry=>{visible=entry.isIntersecting;})).observe(clients);
   }
 }
