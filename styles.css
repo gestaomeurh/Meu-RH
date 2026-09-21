@@ -29,3 +29,20 @@
 .carousel-navigation button:disabled{opacity:.35;cursor:default}
 .logo-window:focus-visible{outline:2px solid #ab7d16;outline-offset:5px}
 @media(prefers-reduced-motion:reduce){.clients.is-ready .logo-window{padding-left:0;padding-right:0}}
+
+/* Consistent optical area and translucent presentation. */
+.clients{background:radial-gradient(ellipse at 15% 30%,#eadfbd55,transparent 55%),linear-gradient(120deg,#f3f2ef,#fafaf8);}
+.client-logo,.client-logo.logo-farma{width:218px;height:142px;padding:22px;background:rgba(255,255,255,.36);border:1px solid rgba(255,255,255,.8);border-radius:14px;box-shadow:0 4px 18px #25221804;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.client-logo .logo-art{width:148px;height:88px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;opacity:.64;filter:saturate(.65);transition:opacity .3s,filter .3s;}
+.client-logo img,.client-logo.logo-farma img{width:100%;height:100%;max-height:none;object-fit:contain;aspect-ratio:auto;padding:0;transform:none;}
+.client-logo.logo-farma img{height:68px;padding:10px;background:#cf202b;border-radius:3px;}
+.client-logo.logo-padded img{transform:scale(1.7);}
+.client-logo.logo-small-mark img{transform:scale(1.55);}
+.client-logo:hover{background:rgba(255,255,255,.65);border-color:#c9b88988;box-shadow:0 5px 20px #25221808;}
+.client-logo:hover .logo-art,.logo-window:focus-visible .logo-art{opacity:1;filter:saturate(1);}
+.carousel-navigation button,.carousel-toggle{background:rgba(255,255,255,.35);border-color:#c8c3b866;}
+.logo-window{scrollbar-color:#b3a27c #dedbd344;}
+.logo-window::-webkit-scrollbar-track{background:#dedbd344;}
+.logo-window::-webkit-scrollbar-thumb{background:#b3a27c;border-color:#eeece7;}
+@media(max-width:760px){.client-logo,.client-logo.logo-farma{width:190px;height:130px;padding:20px;}.client-logo .logo-art{width:140px;height:84px;}}
+.client-logo.logo-farma .logo-art{height:68px;background:#cf202b;border-radius:3px}.client-logo.logo-farma img{height:88px;width:148px;max-width:none;padding:0;background:transparent;transform:scale(1.12)}
